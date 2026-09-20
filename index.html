@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Chordbook — a shared online guitar songbook. Browse, search and add songs with chords, chord diagrams and improvisation maps."
+    />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0e0d0c" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <title>Chordbook</title>
+    <script>
+      // Prerender a tiny loading colour to avoid a white flash on dark theme.
+      try {
+        document.documentElement.style.colorScheme = 'dark';
+        var st = document.createElement('style');
+        st.textContent = 'html,body{background:#0e0d0c}';
+        document.head.appendChild(st);
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      Chordbook needs JavaScript enabled to browse, search and add songs.
+    </noscript>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

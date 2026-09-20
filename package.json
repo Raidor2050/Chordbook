@@ -1,0 +1,31 @@
+{
+  "name": "chordbook",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Chordbook — a shared online guitar songbook. Browse, search, add and play songs with chords, diagrams and improvisation maps.",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test \"tests/unit/*.test.mjs\"",
+    "test:e2e": "playwright test",
+    "seed:sql": "node scripts/export-seed-sql.mjs",
+    "check": "npm run build && npm test"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "@vitejs/plugin-react": "^4.3.2",
+    "fake-indexeddb": "^6.2.5",
+    "vite": "^5.4.8"
+  }
+}

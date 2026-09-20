@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Local environment — never commit real values
+.env
+.env.local
+.env.*.local
+
+# Secrets (paranoia — nothing sensitive should ever appear here)
+*.pem
+*.key
+service-role*
+supabase-service
+
+# Test artefacts
+test-results/
+playwright-report/
+blob-report/
+
+# Editor / OS cruft
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
+__pycache__/
+*.pyc

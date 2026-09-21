@@ -38,7 +38,7 @@ test('a song added manually appears in the songbook and persists across reloads'
 
   await page.goto('/');
   await expect(page.getByRole('link', { name: new RegExp(title) })).toBeVisible();
-  await expect(page.getByText(/11 of 11 songs/)).toBeVisible();
+  await expect(page.getByText(/24 of 24 songs/)).toBeVisible();
 
   await page.reload();
   await expect(page.getByRole('link', { name: new RegExp(title) })).toBeVisible();

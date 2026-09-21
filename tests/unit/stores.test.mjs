@@ -13,11 +13,11 @@ async function newStores() {
   return { local, mem };
 }
 
-test('both stores are seeded with the ten imported setlist songs', async () => {
+test('both stores are seeded with the full imported setlist', async () => {
   const { local, mem } = await newStores();
   for (const store of [local, mem]) {
     const songs = await store.list();
-    assert.equal(songs.length, 10, `${store.kind} has 10 seed songs`);
+    assert.equal(songs.length, 23, `${store.kind} has 23 seed songs`);
     const titles = songs.map((s) => s.title);
     assert.ok(titles.includes('Yellow'));
     assert.ok(titles.includes('The Scientist'));
@@ -41,19 +41,19 @@ test('create then get returns the song; duplicate create is rejected', async () 
   const { local, mem } = await newStores();
   for (const store of [local, mem]) {
     const { song, editToken } = await store.create({
-      title: 'Wonderwall',
-      artist: 'Oasis',
-      sections: [{ name: 'Verse', chords: 'Em G D A7sus4' }],
+      title: 'Blister in the Sun',
+      artist: 'Violent Femmes',
+      sections: [{ name: 'Verse', chords: 'G C Em D' }],
     });
     assert.ok(song.id);
     assert.ok(editToken);
     const fetched = await store.get(song.id);
-    assert.equal(fetched.title, 'Wonderwall');
-    assert.deepEqual(fetched.chords, ['Em', 'G', 'D', 'A7sus4']);
+    assert.equal(fetched.title, 'Blister in the Sun');
+    assert.deepEqual(fetched.chords, ['G', 'C', 'Em', 'D']);
 
     await assert.rejects(
-      store.create({ title: 'wonderwall ', artist: 'oasis', sections: [] }),
-      (err) => isDuplicateError(err) && err.existing && err.existing.title === 'Wonderwall'
+      store.create({ title: 'blister in the sun ', artist: 'violent femmes', sections: [] }),
+      (err) => isDuplicateError(err) && err.existing && err.existing.title === 'Blister in the Sun'
     );
   }
 });

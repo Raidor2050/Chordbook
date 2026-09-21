@@ -1,0 +1,33 @@
+﻿node:internal/modules/cjs/loader:1424
+  throw err;
+  ^
+
+Error: Cannot find module 'G:\AO projects\Chordbook\PROJECT\tests\unit'
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1421:15)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: []
+}
+
+Node.js v24.13.0
+Γ£û tests\unit (80.7868ms)
+Γä╣ tests 1
+Γä╣ suites 0
+Γä╣ pass 0
+Γä╣ fail 1
+Γä╣ cancelled 0
+Γä╣ skipped 0
+Γä╣ todo 0
+Γä╣ duration_ms 96.1437
+
+Γ£û failing tests:
+
+test at tests\unit:1:1
+Γ£û tests\unit (80.7868ms)
+  'test failed'

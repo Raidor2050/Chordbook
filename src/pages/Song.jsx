@@ -6,6 +6,7 @@ import ChordSheet from '../components/ChordSheet.jsx';
 import MetaGrid from '../components/MetaGrid.jsx';
 import ImproviseMap from '../components/ImproviseMap.jsx';
 import SongForm from '../components/SongForm.jsx';
+import PianoView from '../components/PianoView.jsx';
 
 export default function SongPage() {
   const { slug } = useParams();

@@ -1,184 +1,180 @@
 import { useMemo } from 'react';
 
-/**
- * Note-name + pitch-class helpers shared by the piano strip and the chord
- * construction visual. Local (no importer coupling) so the piano view stays a
- * pure, dependency-light component.
- */
-const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-const INTERVAL_LABELS = ['root', 'b2', '2', 'b3', '3', '4', 'b5', '5', 'b6', '6', 'b7', '7'];
+/* ------------------------------------------------------------------ *
+ * PianoView / PianoStrip
+ * A self-contained piano visualization for the Song page.
+ * - PianoStrip: an octave+ strip that lights the notes of one chord on a
+ *   piano keyboard (guitar `piano tabs` counterpart).
+ * - PianoView: the full panel — a lit keyboard for every chord of the song
+ *   plus a "how this chord is put together" construction strip (root / third
+ *   / fifth / extensions with interval math).
+ * Both are pure functions of the chord name; no store coupling, so they are
+ * trivially unit-testable and safe to render on any page.
+ * ------------------------------------------------------------------ */
 
-/** Semitone intervals (relative to root) for the qualities we display. */
-const QUALITY_INTERVALS = {
+export const PC_BY_NAME = { C: 0, 'C#': 1, D: 2, 'D#': 3, E: 4, F: 5, 'F#': 6, G: 7, 'G#': 8, A: 9, 'A#': 10, B: 11 };
+export const NAME_BY_PC = Object.fromEntries(Object.entries(PC_BY_NAME).map(([k, v]) => [v, k]));
+export const PC_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+export const WHITE_PCS = new Set([0, 2, 4, 5, 7, 9, 11]);
+
+/* Semitone offsets from the root for each quality we can visualize. */
+export const QUALITY_SEMIS = {
   '': [0, 4, 7],
   maj: [0, 4, 7],
-  maj7: [0, 4, 7, 11],
+  'maj7': [0, 4, 7, 11],
   '6': [0, 4, 7, 9],
   '9': [0, 4, 7, 14],
   add9: [0, 4, 7, 14],
   m: [0, 3, 7],
   min: [0, 3, 7],
-  m7: [0, 3, 7, 10],
-  m7b5: [0, 3, 6, 10],
-  '7': [0, 4, 7, 10],
+  'm7': [0, 3, 7, 10],
+  'm7b5': [0, 3, 6, 10],
   '7sus4': [0, 5, 7, 10],
+  '7': [0, 4, 7, 10],
   sus: [0, 5, 7],
   sus2: [0, 2, 7],
   sus4: [0, 5, 7],
   dim: [0, 3, 6],
-  dim7: [0, 3, 6, 9],
+  'dim7': [0, 3, 6, 9],
   aug: [0, 4, 8],
-  '5': [0, 7],
 };
 
-const QUALITY_DISPLAY = {
-  '': 'Major triad',
-  maj: 'Major triad',
-  m: 'Minor triad',
-  min: 'Minor triad',
-  maj7: 'Major 7th',
-  '7': 'Dominant 7th',
-  m7: 'Minor 7th',
-  m7b5: 'Half-diminished 7th',
-  '6': 'Major 6th',
-  '9': 'Dominant 9th',
-  add9: 'Major add9',
-  sus: 'Suspended (4)',
-  sus2: 'Suspended 2nd',
-  sus4: 'Suspended 4th',
-  '7sus4': '7th suspended 4th',
-  dim: 'Diminished triad',
-  dim7: 'Diminished 7th',
-  aug: 'Augmented triad',
-  '5': 'Power chord (5th)',
+/* Interval names keyed by semitone offset (position in the construction). */
+export const SEMI_LABEL = {
+  0: 'root',
+  1: 'b2',
+  2: '2',
+  3: 'm3',
+  4: 'M3',
+  5: '4',
+  6: 'b5',
+  7: '5',
+  8: 'b6',
+  9: '6',
+  10: 'b7',
+  11: 'M7',
+  14: '9',
 };
 
-/** Break a chord token into { root, quality } where quality is a lowercase key. */
-function parseChord(chord) {
-  const t = String(chord || '').trim();
+/** Split "C", "Cmaj7", "G#m7b5"… into root + quality. */
+export function parseChordToken(token) {
+  const t = String(token || '').trim();
   const m = /^([A-G][#b]?)(.*)$/.exec(t);
   if (!m) return null;
-  const root = m[1];
   let q = String(m[2] || '').toLowerCase();
-  if (q === 'maj') q = 'maj';
-  if (q === 'm') q = 'm';
   if (q === 'min') q = 'm';
-  if (q === 'aug') q = 'aug';
-  if (q === 'dim') q = 'dim';
-  return { root, quality: q, raw: t };
+  if (q === 'maj') q = 'maj';
+  return { root: m[1], quality: q };
 }
 
-/** The notes (name + pc + interval) that make up a chord, highest note up to 2 octaves. */
-export function chordToNotes(chord) {
-  const w = /^([A-G][#b]?)(.*)$/.exec(String(chord || '').trim());
-  if (!w) return [];
-  const rootPc = NOTE_NAMES.indexOf(w[1]);
-  if (rootPc < 0) return [];
-  let q = String(w[2] || '').toLowerCase();
-  if (q === 'maj') q = 'maj';
-  if (q === 'min') q = 'm';
-  const intervals = QUALITY_INTERVALS[q];
-  if (!intervals) return [];
-  return intervals.map((semi) => {
-    const pc = (rootPc + semi) % 12;
+/** Build the note objects of a chord: { pc, name, degree, semitone }. */
+export function chordToNotes(token) {
+  const p = parseChordToken(token);
+  if (!p) return [];
+  const rootPc = PC_BY_NAME[p.root];
+  if (rootPc === undefined) return [];
+  const semis = QUALITY_SEMIS[p.quality];
+  if (!semis) return [];
+  return semis.map((s) => {
+    const pc = (rootPc + s) % 12;
+    const oct = Math.floor((rootPc + s) / 12);
     return {
-      name: NOTE_NAMES[(rootPc + semi) % 12],
       pc,
-      intervalIdx: semi % 12,
-      interval: INTERVAL_LABELS[semi % 12],
-      octave: Math.floor((rootPc + semi) / 12),
+      name: NAME_BY_PC[pc] + (oct > 0 ? oct + 1 : 70),
+      degree: SEMI_LABEL[s] || String(s),
+      interval: s,
+      accent: s === 0 ? 'root' : s % 12 === 4 ? 'third' : s % 12 === 7 ? 'fifth' : 'tension',
     };
   });
 }
 
-/** A single button-like key for the on-screen piano. */
-function PianoKey({ note, parent }) {
-  const isBlack = note.name.includes('#');
-  const cls = ['pkey', isBlack ? 'black' : 'white'];
-  if (note.kind === 'root') cls.push('root');
-  if (note.kind === 'chord') cls.push('chord');
-  if (note.kind === 'tension') cls.push('tension');
+/** One octave of piano keys with the chord's pitches highlighted. */
+export function PianoStrip({ chord, small = true }) {
+  const notes = useMemo(() => chordToNotes(chord), [chord]);
+  const litPcs = useMemo(() => new Set(notes.map((n) => n.pc)), [notes]);
+  const rootPc = notes[0] ? notes[0].pc : nullL;
   return (
-    <div className={cls.join(' ')} data-pc={note.pc} title={note.name}>
-      <span className="pkey-name">{note.name}</span>
+    <div className="piano-strip" role="img" aria-label={`${chord} highlighted on piano`}>
+      {PC_NAMES.map((name, pc) => {
+        const isBlack = !WHITE_PCS.has(pc);
+        const lit = litPcs.has(pc);
+        const isRoot = lit && pc === rootPc;
+        return (
+          <span
+            key={name}
+            data-pc={pc}
+            className={
+              'pkey' + (isBlack ? ' black' : ' white') + (lit ? ' lit' : '') + (isRoot ? ' root' : '')
+            }
+          />
+        );
+      })}
     </div>
   );
 }
 
-/**
- * Piano split: a rendered keyboard for one chord with its notes highlighted,
- * plus a construction strip (interval → degree label) beneath it.
- */
-export function PianoChord({ chord }) {
-  const model = useMemo(() => {
-    const notes = chordToNotes(chord);
-    if (!notes.length) return null;
-    const pcs = new Set(notes.map((n) => n.pc));
-    return notes.map((n) => ({
-      ...n,
-      kind: n.intervalIdx === 0 ? 'root' : [4, 3].includes(n.intervalIdx) ? 'chord' : 'tension',
-    }));
-  }, [chord]);
-
-  return (
-    <div className="piano-chord" aria-label={`${chord} on piano`}>
-      <div className="piano-strip" role="img" aria-label={`Notes of ${chord}`}>
-        <div className="piano-white">
-          {NOTE_NAMES.map((name, i) => (
-            <PianoKey
-              key={name}
-              parent={name}
-              note={{ name, pc: i, kind: model && model.some((m) => m.pc === i) ? model.find((m) => m.pc === i).kind : null }}
-            />
-          ))}
-        </div>
-        <div className="piano-black">
-          {NOTE_NAMES.map((name, i) =>
-            name.includes('#') ? (
-              <PianoKey key={name} parent={name} note={{ name, pc: i, kind: model && model.find((m) => m.pc === i) ? 'chord' : null }} />
-            ) : null
-          )}
-        </div>
-      </div>
-      <div className="piano-construction">
-        <u>{chord}</u>
-        {model && model.length ? (
-          <span>
-            {model
-              .map((m) => `${m.name} · ${m.interval}${m.kind === 'root' ? ' (root)' : ''}`)
-              .join('  +  ')}
-          </span>
-        ) : (
-          <span>─</span>
-        )}
-      </div>
-    </div>
-  );
-}
-
-/**
- * Split-screen: one column renders the guitar-side (managed by the parent),
- * this component renders the piano side. Lyrics run down the middle, rendered
- * by the parent's ChordSheet; this just provides the tab + construction visuals.
- */
-export default function PianoView({ chords, fallback }) {
-  const list = useMemo(() => [...new Set((chords || []).filter(Boolean))], [chords]);
-  if (!list.length) {
+/** Show which notes make up a chord (construction visual) with interval labels. */
+export function ChordConstruction({ chord }) {
+  const notes = useMemo(() => chordToNotes(chord), [chord]);
+  if (!notes.length) {
     return (
-      <div className="piano-view">
-        <h3>Piano</h3>
-        <p className="piano-empty">No chords yet — add some in the tab above.</p>
+      <div className="construction empty">
+        <em>No construction</em>
       </div>
     );
   }
   return (
-    <div className="piano-view">
-      <h3>Piano tabs &amp; construction</h3>
-      <div className="piano-grid">
-        {list.map((c) => (
-          <PianoChord key={c} chord={c} />
+    <div className="construction" aria-label={`How ${chord} is built`}>
+      <div className="construction-head">
+        <b>{chord}</b>
+        <span>{rootIntervalName(notes[0])} + {notes.map((_, i) => i + 1).join(' · ')} tones</span>
+      </div>
+      <div className="construction-notes">
+        {notes.map((n, i) => (
+          <span key={i} className={'cnote ' + n.accent}>
+            <em>{n.name}</em>
+            <small>{n.degree}</small>
+          </span>
         ))}
       </div>
     </div>
+  );
+}
+
+function rootIntervalName(n) {
+  if (!n) return '';
+  return QUALITY_SEMIS_ROOT_LABEL[n.interval] || 'chromatic';
+}
+
+const QUALITY_SEMIS_ROOT_LABEL = {
+  0: 'same pitch class',
+  2: 'whole step',
+  3: 'minor third stack',
+  4: 'major third stack',
+};
+
+/** Full piano tab panel for a song: strip + construction per chord. */
+export default function PianoView({ chords, songTitle = '' }) {
+  const unique = useMemo(() => [...new Set((chords || []).filter(Boolean))], [chords]);
+  if (!unique.length) {
+    return (
+      <section className="piano-panel empty">
+        <h3>Piano tabs</h3>
+        <p>Add chords above to render the piano view.</p>
+      </section>
+    );
+  }
+  return (
+    <section className="piano-panel" aria-label={`Piano view${songTitle ? ' for ' + songTitle : ''}`}>
+      <h3>Piano tabs &amp; construction</h3>
+      <div className="piano-list">
+        {unique.map((c) => (
+          <div key={c} className="piano-item">
+            <PianoStrip chord={c} />
+            <ChordConstruction chord={c} />
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }

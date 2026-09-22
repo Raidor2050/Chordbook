@@ -5,7 +5,7 @@ test('mobile viewport renders the songbook without horizontal overflow', async (
   page.on('pageerror', (err) => errors.push(String(err)));
   await page.goto('/');
 
-  await expect(page.getByRole('heading', { name: /songbook for guitar/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /songbook/i })).toBeVisible();
   await expect(page.getByRole('link', { name: /The Scientist/ })).toBeVisible();
 
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);

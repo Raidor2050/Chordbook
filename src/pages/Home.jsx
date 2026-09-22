@@ -105,7 +105,7 @@ export default function Home() {
     <>
       <section className="hero">
         <h1>
-          A songbook for <em>guitar</em>
+          A songbook
         </h1>
         <p>
           Browse, search and add songs with chords, chord diagrams and improvisation maps. Songs you

@@ -1,6 +1,6 @@
-// Real lyrics keyed by song slug, used to fill the (currently empty) lyric
-// line under each chord row on the song page. Sections get lyrics by array
-// index (verse 1, chorus, verse 2, ...) matching the seed `chord_data` order.
+// Short "best-known words" lyric snippets keyed by song slug, used to fill the
+// lyric line under each chord row (chord marked directly above the syllable it
+// changes on). Sized to each song's section count from the seed `chord_data`.
 // Kept OUT of seedSongs.js so the 23/24 catalog-count gate stays untouched.
 export const SONG_LYRICS = {
   'yellow-coldplay': [
@@ -16,7 +16,7 @@ export const SONG_LYRICS = {
     "See the thorn twist in your side",
     "I'll wait for you, sleight of hand",
     "And twist of fate, on a bed of nails",
-    "She'll wait for you, and you'll wait for me",
+    "And she'll wait for you, and you'll wait for me",
     "And I'm on your side, like an in-between",
   ],
   'i-m-yours-jason-mraz': [
@@ -32,8 +32,8 @@ export const SONG_LYRICS = {
     "By now you should've somehow realised what you gotta do",
     "I don't believe that anybody feels the way I do about you now",
     "And backbeat, the word is on the street that the fire in your heart is out",
-    "I'm sure you've heard it all before, but you never really had a doubt",
-    "I don't believe that anybody feels the way I do about you now",
+    "And I'm sure you've heard it all before, but you never really had a doubt",
+    "And I don't believe that anybody feels the way I do about you now",
   ],
   'the-scientist-coldplay': [
     "Come up to meet you, tell you I'm sorry",
@@ -52,5 +52,89 @@ export const SONG_LYRICS = {
     "When you lose something you can't replace",
     "When you love someone, but it goes to waste",
     "Could it be worse?",
+  ],
+  'more-than-words-extreme': [
+    "Saying I love you is not the words I want to hear from you",
+    "It's not that I want you not to say, but if you only knew",
+    "How easy it would be to show me how you feel",
+    "More than words is all you have to do to make it real",
+  ],
+  'sunflower-post-malone': [
+    "Needless to say, I keep her in check",
+    "She was all bad-bad, nevertheless",
+    "Callin' it quits now, baby, I'm a wreck",
+    "Crash at my place, baby, you're a wreck",
+  ],
+  'how-to-save-a-life-the-fray': [
+    "Step one, you say we need to talk",
+    "He walks, you say sit down, it's just a talk",
+    "He smiles politely back at you",
+  ],
+  'all-i-want-kodaline': [
+    "All I want is nothing more",
+    "Than to hear you knocking at my door",
+    "'Cause if I could see your face once more",
+    "I could die as a happy man, I'm sure",
+  ],
+  'secrets-onerepublic': [
+    "I need another story, something to get off my chest",
+    "My life gets kind of boring, need something that I can confess",
+    "Till all my sleeves are stained red from all the truth that I've been hiding",
+  ],
+  'demons-imagine-dragons': [
+    "When the days are cold and the cards all fold",
+    "And the saints we see are all made of gold",
+    "When your dreams all fail and the ones we hail",
+    "Are the worst of all, and the blood's run stale",
+  ],
+  'iris-goo-goo-dolls': [
+    "And I'd give up forever to touch you",
+    "Cause I know that you feel me somehow",
+    "You're the closest to heaven that I'll ever be",
+    "And I don't want to go home right now",
+  ],
+  'let-it-be-the-beatles': [
+    "When I find myself in times of trouble, Mother Mary comes to me",
+    "Speaking words of wisdom, let it be",
+    "And in my hour of darkness she is standing right in front of me",
+  ],
+  'brown-eyed-girl-van-morrison': [
+    "Hey, where did we go? Days when the rain came",
+    "Down in the hollow, playin' a new game",
+    "Laughing and a-running, hey, hey, skipping and a-jumping",
+  ],
+  'knockin-on-heaven-s-door-bob-dylan': [
+    "Mama, take this badge off of me",
+    "I can't use it anymore",
+  ],
+  'riptide-vance-joy': [
+    "I was scared of dentists and the dark",
+    "I was scared of pretty girls and starting conversations",
+    "Oh, all my friends are turning green, you're the magician's assistant in their dream",
+  ],
+  'can-t-help-falling-in-love-elvis-presley': [
+    "Wise men say only fools rush in",
+    "But I can't help falling in love with you",
+  ],
+  'hallelujah-leonard-cohen': [
+    "Now I've heard there was a secret chord",
+    "That David played, and it pleased the Lord",
+  ],
+  'free-fallin-tom-petty': [
+    "She's a good girl, loves her mama",
+    "Loves Jesus, and America too",
+  ],
+  'sweet-home-alabama-lynyrd-skynyrd': [
+    "Big wheels keep on turning",
+    "Carry me home to see my kin",
+  ],
+  'take-me-home-country-roads-john-denver': [
+    "Almost heaven, West Virginia, Blue Ridge Mountains, Shenandoah River",
+    "Life is old there, older than the trees, younger than the mountains, growing like a breeze",
+    "Country roads, take me home, to the place I belong",
+  ],
+  'save-tonight-eagle-eye-cherry': [
+    "Goin' to the club, gonna have a good time",
+    "I'm gonna get loose, gonna get right tonight",
   ],
 };

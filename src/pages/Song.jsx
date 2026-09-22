@@ -7,6 +7,7 @@ import MetaGrid from '../components/MetaGrid.jsx';
 import ImproviseMap from '../components/ImproviseMap.jsx';
 import SongForm from '../components/SongForm.jsx';
 import PianoView from '../components/PianoView.jsx';
+import { SONG_LYRICS } from '../data/lyrics.js';
 
 export default function SongPage() {
   const { slug } = useParams();
@@ -152,7 +153,7 @@ export default function SongPage() {
                     )}
                   </header>
                   <div className="sheet-body">
-                    <ChordSheet section={sec} />
+                    <ChordSheet section={{ ...sec, lyrics: (SONG_LYRICS[song.slug] || [])[i] || sec.lyrics }} />
                   </div>
                 </section>
               ))}
